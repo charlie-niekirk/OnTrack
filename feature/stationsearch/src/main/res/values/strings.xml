@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="station_fetch_error">Error fetching station list!</string>
+</resources>
