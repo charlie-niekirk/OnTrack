@@ -1,4 +1,4 @@
-package me.cniekirk.ontrack.core.di.viewmodel
+package me.cniekirk.ontrack.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -6,11 +6,12 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
+import me.cniekirk.ontrack.core.di.viewmodel.ViewModelGraph
 import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @Inject
-class MetroViewModelFactory(val viewModelGraph: ViewModelGraph) : ViewModelProvider.Factory {
+class MetroViewModelFactory(val appGraph: OnTrackGraph) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
         val viewModelGraph = viewModelGraph(extras)
@@ -25,5 +26,5 @@ class MetroViewModelFactory(val viewModelGraph: ViewModelGraph) : ViewModelProvi
         return modelClass.cast(provider())
     }
 
-    fun viewModelGraph(extras: CreationExtras): ViewModelGraph = viewModelGraph.createViewModelGraph(extras)
+    fun viewModelGraph(extras: CreationExtras): ViewModelGraph = appGraph.createViewModelGraph(extras)
 }

@@ -4,7 +4,7 @@ import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entry
 import kotlinx.serialization.Serializable
-import me.cniekirk.ontrack.core.di.viewmodel.metroViewModel
+import me.cniekirk.ontrack.core.compose.di.metroViewModel
 
 fun EntryProviderBuilder<NavKey>.home() {
     entry<Home> {

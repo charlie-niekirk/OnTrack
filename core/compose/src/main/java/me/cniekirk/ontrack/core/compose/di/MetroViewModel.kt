@@ -1,4 +1,4 @@
-package me.cniekirk.ontrack.core.di.viewmodel
+package me.cniekirk.ontrack.core.compose.di
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import me.cniekirk.ontrack.core.di.components.MetroViewModelFactory
+import me.cniekirk.ontrack.core.di.viewmodel.ViewModelGraph
 
 @Composable
 inline fun <reified VM : ViewModel> metroViewModel(
