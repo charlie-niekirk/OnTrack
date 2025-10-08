@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":core:network"))
 
     implementation(project(":feature:home"))
+    implementation(project(":feature:stationsearch"))
 
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)

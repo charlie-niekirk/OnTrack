@@ -9,6 +9,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import dev.zacsweers.metro.createGraphFactory
 import me.cniekirk.ontrack.core.data.work.UpdateStationsWorker
+import me.cniekirk.ontrack.di.DelegatingWorkerFactory
 import me.cniekirk.ontrack.di.OnTrackGraph
 import java.util.concurrent.TimeUnit
 

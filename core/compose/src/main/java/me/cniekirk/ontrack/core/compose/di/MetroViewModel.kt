@@ -1,16 +1,22 @@
 package me.cniekirk.ontrack.core.compose.di
 
-import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.HasDefaultViewModelProviderFactory
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import me.cniekirk.ontrack.core.di.components.MetroViewModelFactory
 import me.cniekirk.ontrack.core.di.viewmodel.ViewModelGraph
+import kotlin.reflect.KClass
+
+// Define the CompositionLocal for the ViewModelGraph creator function
+// This decouples the composable from app-specific graphs/factories
+val LocalViewModelGraphFactory = compositionLocalOf<(CreationExtras) -> ViewModelGraph> {
+    error("No ViewModelGraph factory provided via LocalViewModelGraphFactory")
+}
 
 @Composable
 inline fun <reified VM : ViewModel> metroViewModel(
@@ -20,7 +26,25 @@ inline fun <reified VM : ViewModel> metroViewModel(
         },
     key: String? = null,
 ): VM {
-    return viewModel(viewModelStoreOwner, key, factory = metroViewModelProviderFactory())
+    val graphFactory = LocalViewModelGraphFactory.current
+    val factory = remember {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                val viewModelGraph = graphFactory(extras)
+                val modelKClass: KClass<out ViewModel> = modelClass.kotlin
+                val provider = viewModelGraph.viewModelProviders[modelKClass]
+                    ?: throw IllegalArgumentException("Unknown model class $modelClass")
+                @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "UNCHECKED_CAST")
+                return provider() as T
+            }
+        }
+    }
+    return viewModel(
+        modelClass = VM::class.java,
+        viewModelStoreOwner = viewModelStoreOwner,
+        key = key,
+        factory = factory
+    )
 }
 
 @Composable
@@ -32,22 +56,20 @@ inline fun <reified VM : ViewModel> metroViewModel(
     key: String? = null,
     crossinline factory: ViewModelGraph.() -> VM,
 ): VM {
-    val metroViewModelProviderFactory = metroViewModelProviderFactory()
+    val graphFactory = LocalViewModelGraphFactory.current
+    val vmFactory = remember {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                val viewModelGraph = graphFactory(extras)
+                @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "UNCHECKED_CAST")
+                return viewModelGraph.factory() as T
+            }
+        }
+    }
     return viewModel(
-        viewModelStoreOwner,
-        key,
-        factory =
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                    val viewModelGraph = metroViewModelProviderFactory.viewModelGraph(extras)
-                    return modelClass.cast(viewModelGraph.factory())!!
-                }
-            },
+        modelClass = VM::class.java,
+        viewModelStoreOwner = viewModelStoreOwner,
+        key = key,
+        factory = vmFactory
     )
-}
-
-@Composable
-fun metroViewModelProviderFactory(): MetroViewModelFactory {
-    return (LocalActivity.current as HasDefaultViewModelProviderFactory)
-        .defaultViewModelProviderFactory as MetroViewModelFactory
 }

@@ -11,7 +11,7 @@ import org.orbitmvi.orbit.viewmodel.container
 @Inject
 @ViewModelKey(HomeViewModel::class)
 @ContributesIntoMap(HomeViewModel::class, binding = binding<ViewModel>())
-class HomeViewModel : ViewModel(), ContainerHost<HomeState, HomeEffect> {
+internal class HomeViewModel : ViewModel(), ContainerHost<HomeState, HomeEffect> {
 
     override val container = container<HomeState, HomeEffect>(HomeState()) {
 

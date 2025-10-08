@@ -1,5 +1,7 @@
 package me.cniekirk.ontrack.core.data.repository
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Result
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
@@ -7,6 +9,7 @@ import me.cniekirk.ontrack.core.data.mapper.toStation
 import me.cniekirk.ontrack.core.database.dao.StationDao
 import me.cniekirk.ontrack.core.database.entity.StationEntity
 import me.cniekirk.ontrack.core.domain.model.Station
+import me.cniekirk.ontrack.core.domain.model.error.NetworkError
 import me.cniekirk.ontrack.core.domain.repository.StationsRepository
 import me.cniekirk.ontrack.core.network.api.openraildata.OpenRailDataApi
 
@@ -31,13 +34,14 @@ internal class StationsRepositoryImpl(
         stationDao.insertAll(stations)
     }
 
-    override suspend fun getStations(forceRefresh: Boolean): List<Station> {
+    override suspend fun getStations(forceRefresh: Boolean): Result<List<Station>, NetworkError> {
         val isEmpty = stationDao.getCount() == 0
 
         if (forceRefresh || isEmpty) {
             updateStations()
         }
 
-        return stationDao.getAllStations().map { it.toStation() }
+//        return stationDao.getAllStations().map { it.toStation() }
+        return Err(NetworkError.HttpError(500, ""))
     }
 }
