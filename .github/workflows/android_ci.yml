@@ -1,0 +1,143 @@
+# .github/workflows/android_build.yml
+name: Android CI - Build, Sign, & Comment on PR
+
+on:
+  pull_request:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Add permissions for the GITHUB_TOKEN to allow writing comments on pull requests.
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      # Step 1: Check out the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up the Java Development Kit (JDK)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      # Step 3: Decode the base64 encoded keystore file from GitHub Secrets
+      # The convention plugin will read the file path from the SIGNING_KEY_STORE_PATH environment variable.
+      - name: Decode Keystore
+        run: echo "${{ secrets.RELEASE_STORE_FILE }}" | base64 --decode > ${{ github.workspace }}/release.jks
+        # This command decodes the secret and creates the keystore file with the .jks extension
+
+      # Step 4: Make the Gradle wrapper executable
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      # Step 5: Build and sign the APK and AAB files
+      # This step exposes the secrets as environment variables.
+      # Your convention plugin is set up to read these variables to configure the signing.
+      - name: Build and Sign with Gradle
+        env:
+          SIGNING_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          # This path points to the keystore file created in the 'Decode Keystore' step
+          SIGNING_KEY_STORE_PATH: ${{ github.workspace }}/release.jks
+        run: ./gradlew assembleRelease bundleRelease
+
+      # Step 6: Upload the signed APK file as a build artifact
+      # An 'id' is added to this step to reference its outputs later.
+      - name: Upload Signed APK artifact
+        uses: actions/upload-artifact@v4
+        id: apk_artifact
+        with:
+          name: release-apk-signed
+          path: app/build/outputs/apk/release/app-release.apk
+
+      # Step 7: Upload the signed AAB file as a build artifact
+      # An 'id' is added to this step to reference its outputs later.
+      - name: Upload Signed AAB artifact
+        uses: actions/upload-artifact@v4
+        id: aab_artifact
+        with:
+          name: release-aab-signed
+          path: app/build/outputs/bundle/release/app-release.aab
+
+      # Step 8: Post a comment on the Pull Request with links to the signed artifacts
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const run_id = context.runId;
+            const commit_sha = context.sha;
+            const short_sha = commit_sha.substring(0, 7);
+            const commit_url = `https://github.com/${owner}/${repo}/commit/${commit_sha}`;
+            
+            // Construct the correct URLs using the artifact IDs passed as environment variables.
+            const apk_url = `https://github.com/${owner}/${repo}/actions/runs/${run_id}/artifacts/${process.env.APK_ARTIFACT_ID}`;
+            const aab_url = `https://github.com/${owner}/${repo}/actions/runs/${run_id}/artifacts/${process.env.AAB_ARTIFACT_ID}`;
+            
+            const commentBody = `
+            ✅ Build successful and signed!
+            
+            Built from commit: [${short_sha}](${commit_url})
+            
+            You can download the signed build artifacts here:
+            - [APK](${apk_url})
+            - [AAB](${aab_url})
+            
+            *Note: You need to be logged into GitHub to download the artifacts. These are release-signed builds.*
+            `;
+            
+            // Fetch existing comments
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+            });
+            
+            console.log(`Total comments fetched: ${comments.length}`);
+            
+            // Find the existing build comment (assuming only one; edit the latest if multiple)
+            let existingComment = null;
+            for (const comment of comments.reverse()) {  // Reverse to get the latest first
+              console.log(`Checking comment ID: ${comment.id}, User: ${comment.user.login}, Body starts with: ${comment.body.substring(0, 30)}...`);
+              if (comment.user.login === 'github-actions[bot]' && comment.body.trim().startsWith('✅ Build successful and signed!')) {
+                existingComment = comment;
+                console.log(`Found matching comment: ID ${comment.id}`);
+                break;
+              }
+            }
+            
+            if (existingComment) {
+              console.log(`Updating existing comment ID: ${existingComment.id}`);
+              // Update the existing comment
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existingComment.id,
+                body: commentBody,
+              });
+            } else {
+              console.log('No existing comment found, creating a new one.');
+              // Create a new comment
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body: commentBody,
+              });
+            }
+        env:
+          # Pass the artifact IDs from the upload steps as environment variables to the script.
+          APK_ARTIFACT_ID: ${{ steps.apk_artifact.outputs.artifact-id }}
+          AAB_ARTIFACT_ID: ${{ steps.aab_artifact.outputs.artifact-id }}
