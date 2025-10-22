@@ -1,24 +1,127 @@
 package me.cniekirk.ontrack.core.data.repository
 
-import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ContributesBinding
-import dev.zacsweers.metro.Inject
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
+import me.cniekirk.ontrack.core.data.mapper.toTrainService
+import me.cniekirk.ontrack.core.data.util.safeApiCall
+import me.cniekirk.ontrack.core.domain.model.error.NetworkError
+import me.cniekirk.ontrack.core.domain.model.services.TrainService
 import me.cniekirk.ontrack.core.domain.repository.RealtimeTrainsRepository
-import me.cniekirk.ontrack.core.network.api.RealtimeTrainsRemoteDataSource
+import me.cniekirk.ontrack.core.network.api.realtimetrains.RealtimeTrainsApi
 
-@ContributesBinding(AppScope::class)
-@Inject
 internal class RealtimeTrainsRepositoryImpl(
-    private val realtimeTrainsRemoteDataSource: RealtimeTrainsRemoteDataSource
+    private val realtimeTrainsApi: RealtimeTrainsApi
 ) : RealtimeTrainsRepository {
 
-    override suspend fun getDepartureBoard(
+    override suspend fun getDepartureBoardOnDateTime(
         station: String,
         year: String,
         month: String,
         day: String,
         time: String
-    ): List<String> {
-        return listOf()
+    ): Result<List<TrainService>, NetworkError> {
+        return safeApiCall {
+            realtimeTrainsApi.getDeparturesOnDateTime(
+                location = station,
+                year = year,
+                month = month,
+                day = day,
+                time = time
+            )
+        }.map { response -> response.services.map { it.toTrainService() } }
+    }
+
+    override suspend fun getDepartureBoardOnDateTimeTo(
+        fromStation: String,
+        toStation: String,
+        year: String,
+        month: String,
+        day: String,
+        time: String
+    ): Result<List<TrainService>, NetworkError> {
+        return safeApiCall {
+            realtimeTrainsApi.getDeparturesToOnDateTime(
+                location = fromStation,
+                toLocation = toStation,
+                year = year,
+                month = month,
+                day = day,
+                time = time
+            )
+        }.map { response -> response.services.map { it.toTrainService() } }
+    }
+
+    override suspend fun getArrivalBoardOnDateTime(
+        station: String,
+        year: String,
+        month: String,
+        day: String,
+        time: String
+    ): Result<List<TrainService>, NetworkError> {
+        return safeApiCall {
+            realtimeTrainsApi.getArrivalsOnDateTime(
+                location = station,
+                year = year,
+                month = month,
+                day = day,
+                time = time
+            )
+        }.map { response -> response.services.map { it.toTrainService(isArrival = true) } }
+    }
+
+    override suspend fun getArrivalBoardOnDateTimeFrom(
+        atStation: String,
+        fromStation: String,
+        year: String,
+        month: String,
+        day: String,
+        time: String
+    ): Result<List<TrainService>, NetworkError> {
+        return safeApiCall {
+            realtimeTrainsApi.getArrivalsFromOnDateTime(
+                location = atStation,
+                fromLocation = fromStation,
+                year = year,
+                month = month,
+                day = day,
+                time = time
+            )
+        }.map { response -> response.services.map { it.toTrainService(isArrival = true) } }
+    }
+
+    override suspend fun getCurrentDepartureBoard(station: String): Result<List<TrainService>, NetworkError> {
+        return safeApiCall {
+            realtimeTrainsApi.getCurrentDepartures(location = station)
+        }.map { response -> response.services.map { it.toTrainService() } }
+    }
+
+    override suspend fun getCurrentDepartureBoardTo(
+        fromStation: String,
+        toStation: String
+    ): Result<List<TrainService>, NetworkError> {
+        return safeApiCall {
+            realtimeTrainsApi.getCurrentDeparturesTo(
+                location = fromStation,
+                toLocation = toStation
+            )
+        }.map { response -> response.services.map { it.toTrainService() } }
+    }
+
+    override suspend fun getCurrentArrivalBoard(station: String): Result<List<TrainService>, NetworkError> {
+        return safeApiCall {
+            realtimeTrainsApi.getCurrentArrivals(location = station)
+        }.map { response -> response.services.map { it.toTrainService(isArrival = true) } }
+    }
+
+    override suspend fun getCurrentArrivalBoardFrom(
+        atStation: String,
+        fromStation: String
+    ): Result<List<TrainService>, NetworkError> {
+        return safeApiCall {
+            realtimeTrainsApi.getCurrentArrivalsFrom(
+                location = atStation,
+                fromLocation = fromStation
+            )
+        }.map { response -> response.services.map { it.toTrainService(isArrival = true) } }
     }
 }

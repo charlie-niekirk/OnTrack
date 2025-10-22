@@ -5,7 +5,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "stations")
 data class StationEntity(
-    @PrimaryKey val tiploc: String,
+    @PrimaryKey val crs: String,
     val name: String,
-    val crs: String?
 )

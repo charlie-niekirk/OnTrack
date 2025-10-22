@@ -1,4 +1,10 @@
 package me.cniekirk.ontrack.feature.servicelist
 
-interface ServiceListEffect {
+import me.cniekirk.ontrack.feature.servicelist.model.ServiceListError
+
+sealed interface ServiceListEffect {
+
+    data class DisplayError(
+        val serviceListError: ServiceListError
+    ) : ServiceListEffect
 }

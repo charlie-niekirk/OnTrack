@@ -29,6 +29,8 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 implementation(project(":core:domain"))
                 implementation(project(":core:compose"))
                 implementation(project(":core:di"))
+                implementation(project(":core:navigation"))
+                implementation(project(":core:platform"))
 
                 implementation(libs.findLibrary("androidx-navigation3-runtime").get())
                 implementation(libs.findLibrary("androidx-navigation3-ui").get())

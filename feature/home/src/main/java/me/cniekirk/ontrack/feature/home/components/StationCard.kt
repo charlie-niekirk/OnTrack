@@ -41,7 +41,7 @@ internal fun StationCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .background(
-                color = MaterialTheme.colorScheme.secondaryContainer,
+                color = MaterialTheme.colorScheme.primaryContainer,
                 shape = RoundedCornerShape(8.dp)
             )
             .clickable(onClick = onClick),
@@ -66,10 +66,12 @@ internal fun StationCard(
         Box(modifier = Modifier.padding(end = 8.dp)) {
             when (stationSelection) {
                 is StationSelection.None -> {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
-                        contentDescription = null
-                    )
+                    IconButton(onClick = onClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
+                            contentDescription = null
+                        )
+                    }
                 }
                 is StationSelection.Selected -> {
                     IconButton(onClick = onClearSelectionClick) {
@@ -90,7 +92,7 @@ private fun StationCardSelectedPreview() {
     OnTrackTheme {
         Surface {
             StationCard(
-                stationSelection = StationSelection.Selected(Station("London Bridge", "LBG", "")),
+                stationSelection = StationSelection.Selected(Station("London Bridge", "LBG")),
                 placeholder = R.string.empty_departing_station,
                 onClick = {},
                 onClearSelectionClick = {}

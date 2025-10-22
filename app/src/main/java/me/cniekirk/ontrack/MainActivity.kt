@@ -14,7 +14,7 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
-import me.cniekirk.ontrack.core.compose.di.LocalViewModelGraphFactory
+import me.cniekirk.ontrack.di.LocalViewModelGraphFactory
 import me.cniekirk.ontrack.core.compose.theme.OnTrackTheme
 import me.cniekirk.ontrack.core.di.components.ActivityKey
 import me.cniekirk.ontrack.navigation.OnTrackNavigation

@@ -6,7 +6,7 @@ import me.cniekirk.ontrack.core.domain.model.error.NetworkError
 
 interface StationsRepository {
 
-    suspend fun updateStations()
+    suspend fun updateStations(): Result<Unit, NetworkError>
 
     suspend fun getStations(forceRefresh: Boolean = false): Result<List<Station>, NetworkError>
 }

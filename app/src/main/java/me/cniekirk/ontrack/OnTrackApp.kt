@@ -11,6 +11,7 @@ import dev.zacsweers.metro.createGraphFactory
 import me.cniekirk.ontrack.core.data.work.UpdateStationsWorker
 import me.cniekirk.ontrack.di.DelegatingWorkerFactory
 import me.cniekirk.ontrack.di.OnTrackGraph
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class OnTrackApp : Application() {
@@ -19,6 +20,10 @@ class OnTrackApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
 
         val configuration = Configuration.Builder()
             .setWorkerFactory(DelegatingWorkerFactory(appGraph))

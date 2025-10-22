@@ -49,14 +49,23 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:database"))
     implementation(project(":core:di"))
+    implementation(project(":core:domain"))
+    implementation(project(":core:navigation"))
     implementation(project(":core:network"))
+    implementation(project(":core:platform"))
 
     implementation(project(":feature:home"))
+    implementation(project(":feature:servicelist"))
     implementation(project(":feature:stationsearch"))
+
+    implementation(libs.org.orbit.mvi.core)
+    implementation(libs.org.orbit.mvi.compose)
+    implementation(libs.org.orbit.mvi.viewmodel)
 
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.org.jetbrains.kotlinx.serialization.json)
 

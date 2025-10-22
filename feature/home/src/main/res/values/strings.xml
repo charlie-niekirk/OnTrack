@@ -1,3 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="train_times_title">Search for Trains</string>
+    <string name="empty_departing_station">Trains departing from</string>
+    <string name="empty_arriving_station">Trains arriving at</string>
+    <string name="empty_arriving_filter_station">Coming from</string>
+    <string name="empty_departing_filter_station">Going to</string>
+
+    <string name="departures_title">Departures</string>
+    <string name="arrivals_title">Arrivals</string>
+
+    <string name="now_departure_time">Today, now</string>
+    <string name="set_departure_time">%1$s/%2$s/%3$s at %4$s:%5$s</string>
+
+    <string name="date_picker_confirm">OK</string>
+    <string name="date_picker_cancel">Cancel</string>
+
+    <string name="button_search">Search</string>
+
+    <string name="cd_clear_station">Clear station</string>
 </resources>

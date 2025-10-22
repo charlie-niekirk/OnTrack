@@ -1,14 +1,12 @@
-package me.cniekirk.ontrack.navigation
+package me.cniekirk.ontrack.core.navigation
 
-import kotlinx.serialization.Serializable
+enum class StationType {
+    TARGET,
+    FILTER
+}
 
-@Serializable
 data class StationResult(
+    val stationType: StationType,
     val crs: String,
     val name: String
-)
-
-@Serializable
-data class StationSelectionResult(
-    val stationResult: StationResult
 )

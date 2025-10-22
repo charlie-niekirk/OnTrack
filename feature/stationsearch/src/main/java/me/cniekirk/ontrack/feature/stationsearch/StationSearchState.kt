@@ -1,8 +1,11 @@
 package me.cniekirk.ontrack.feature.stationsearch
 
 import me.cniekirk.ontrack.core.domain.model.Station
+import me.cniekirk.ontrack.core.navigation.StationType
 
-internal data class StationSearchState(
+data class StationSearchState(
+    val stationType: StationType,
     val isLoading: Boolean = true,
-    val stations: List<Station> = emptyList()
+    val stations: List<Station> = emptyList(),
+    val searchQuery: String = ""
 )

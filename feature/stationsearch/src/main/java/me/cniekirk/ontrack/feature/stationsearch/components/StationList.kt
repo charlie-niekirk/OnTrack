@@ -20,7 +20,8 @@ import me.cniekirk.ontrack.core.compose.theme.OnTrackTheme
 @Composable
 fun StationList(
     stations: List<Station>,
-    onStationClicked: (Station) -> Unit
+    onStationClicked: (Station) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn {
         items(stations) { station ->

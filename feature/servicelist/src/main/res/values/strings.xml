@@ -1,3 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="departures">Departures</string>
+    <string name="arrivals">Arrivals</string>
+    <string name="to">%1$s to %2$s</string>
+    <string name="from">%1$s from %2$s</string>
+
+    <string name="cancelled_time_status">Cancelled due to %1$s</string>
+    <string name="delayed_time_status">Delayed by %1$d mins</string>
+    <string name="departed_delayed_time_status">Departed %1$d mins late</string>
+    <string name="departed_on_time_time_status">Departed on time</string>
+    <string name="arrived_delayed_time_status">Arrived %1$d mins late</string>
+    <string name="arrived_on_time_time_status">Arrived on time</string>
+    <string name="on_time">On Time</string>
+
+    <string name="service_location_approaching_station">Approaching station</string>
+    <string name="service_location_approaching_platform">Approaching platform</string>
+    <string name="service_location_at_platform">At platform</string>
+    <string name="service_location_preparing_departure">Preparing departure</string>
+    <string name="service_location_ready_to_depart">Ready to depart</string>
 </resources>

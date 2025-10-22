@@ -8,15 +8,24 @@ import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Multibinds
 import dev.zacsweers.metro.Provider
 import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.binding
 import me.cniekirk.ontrack.core.data.di.DataProviders
 import me.cniekirk.ontrack.core.database.di.DatabaseProviders
 import me.cniekirk.ontrack.core.di.components.ApplicationContext
-import me.cniekirk.ontrack.core.di.viewmodel.ViewModelGraph
+import me.cniekirk.ontrack.di.ViewModelGraph
 import me.cniekirk.ontrack.core.network.di.NetworkProviders
+import me.cniekirk.ontrack.core.platform.di.PlatformProviders
 import kotlin.reflect.KClass
 
-@DependencyGraph(AppScope::class)
-interface OnTrackGraph : ViewModelGraph.Factory, DataProviders, NetworkProviders, DatabaseProviders {
+@DependencyGraph(
+    scope = AppScope::class,
+    bindingContainers = [
+        NetworkProviders::class,
+        DatabaseProviders::class,
+        PlatformProviders::class
+    ]
+)
+interface OnTrackGraph : ViewModelGraph.Factory, DataProviders {
 
     @Provides
     @ApplicationContext

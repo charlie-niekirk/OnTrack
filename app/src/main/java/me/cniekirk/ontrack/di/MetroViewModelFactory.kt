@@ -6,7 +6,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
-import me.cniekirk.ontrack.core.di.viewmodel.ViewModelGraph
+import me.cniekirk.ontrack.di.ViewModelGraph
 import timber.log.Timber
 
 //@ContributesBinding(AppScope::class)

@@ -1,4 +1,4 @@
-package me.cniekirk.ontrack.core.compose.di
+package me.cniekirk.ontrack.di
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import me.cniekirk.ontrack.core.di.viewmodel.ViewModelGraph
 import kotlin.reflect.KClass
 
 // Define the CompositionLocal for the ViewModelGraph creator function
