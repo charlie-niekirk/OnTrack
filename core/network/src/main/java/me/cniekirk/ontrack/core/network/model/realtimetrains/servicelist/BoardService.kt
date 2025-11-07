@@ -1,12 +1,12 @@
 package me.cniekirk.ontrack.core.network.model.realtimetrains.servicelist
 
 import kotlinx.serialization.Serializable
-import me.cniekirk.ontrack.core.network.model.realtimetrains.common.ServiceLocation
+import me.cniekirk.ontrack.core.network.model.realtimetrains.common.ServiceStopLocation
 import me.cniekirk.ontrack.core.network.model.realtimetrains.common.ServiceType
 
 @Serializable
 data class BoardService(
-    val locationDetail: ServiceLocation,
+    val locationDetail: ServiceStopLocation,
     val serviceUid: String,
     val runDate: String,
     val trainIdentity: String? = null,

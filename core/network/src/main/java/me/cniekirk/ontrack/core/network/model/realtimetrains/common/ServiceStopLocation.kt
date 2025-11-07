@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ServiceLocation(
+data class ServiceStopLocation(
     @SerialName("realtimeActivated") val realtimeActivated: Boolean = false,
     @SerialName("tiploc") val tiploc: String,
     @SerialName("crs") val crs: String? = null,

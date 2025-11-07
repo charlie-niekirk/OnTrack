@@ -2,6 +2,7 @@ package me.cniekirk.ontrack.core.domain.repository
 
 import com.github.michaelbull.result.Result
 import me.cniekirk.ontrack.core.domain.model.error.NetworkError
+import me.cniekirk.ontrack.core.domain.model.servicedetails.ServiceDetails
 import me.cniekirk.ontrack.core.domain.model.services.TrainService
 
 interface RealtimeTrainsRepository {
@@ -58,10 +59,10 @@ interface RealtimeTrainsRepository {
         fromStation: String
     ): Result<List<TrainService>, NetworkError>
 
-//    suspend fun getServiceDetails(
-//        serviceUid: String,
-//        year: String,
-//        month: String,
-//        day: String
-//    ): Result<, NetworkError>
+    suspend fun getServiceDetails(
+        serviceUid: String,
+        year: String,
+        month: String,
+        day: String
+    ): Result<ServiceDetails, NetworkError>
 }

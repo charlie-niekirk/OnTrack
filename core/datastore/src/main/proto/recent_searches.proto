@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option java_package = "me.cniekirk.ontrack.core.datastore";
+option java_multiple_files = true;
+
+message RecentSearches {
+  enum ServiceListType {
+    DEPARTURES = 0;
+    ARRIVALS = 1;
+  }
+
+  message TrainStation {
+    string crs = 1;
+    string name = 2;
+  }
+
+  message RequestTime {
+    string minute = 1;
+    string hour = 2;
+    string day = 3;
+    string month = 4;
+    string year = 5;
+  }
+
+  message ServiceListRequest {
+    ServiceListType service_list_type = 1;
+    TrainStation target_station = 2;
+    optional TrainStation filter_station = 3;
+    optional RequestTime request_time = 4;
+  }
+
+  repeated ServiceListRequest recent_searches = 1;
+}

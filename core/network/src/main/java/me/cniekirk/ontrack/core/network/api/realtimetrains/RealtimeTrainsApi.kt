@@ -1,5 +1,6 @@
 package me.cniekirk.ontrack.core.network.api.realtimetrains
 
+import me.cniekirk.ontrack.core.network.model.realtimetrains.servicedetail.ServiceDetail
 import me.cniekirk.ontrack.core.network.model.realtimetrains.servicelist.SearchResponse
 import retrofit2.Response
 import retrofit2.http.GET
@@ -73,5 +74,5 @@ interface RealtimeTrainsApi {
         @Path("year") year: String,
         @Path("month") month: String,
         @Path("day") day: String
-    )
+    ): Response<ServiceDetail>
 }

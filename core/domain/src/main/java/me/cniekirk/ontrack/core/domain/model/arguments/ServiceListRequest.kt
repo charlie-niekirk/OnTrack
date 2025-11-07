@@ -1,7 +1,6 @@
-package me.cniekirk.ontrack.core.navigation
+package me.cniekirk.ontrack.core.domain.model.arguments
 
 import kotlinx.serialization.Serializable
-import me.cniekirk.ontrack.core.domain.model.Station
 
 enum class ServiceListType {
     DEPARTURES,

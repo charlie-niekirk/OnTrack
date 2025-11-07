@@ -4,6 +4,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 internal class LocalTimeProvider : TimeProvider {
 
@@ -18,5 +19,9 @@ internal class LocalTimeProvider : TimeProvider {
         val instant = Instant.ofEpochMilli(millis)
         val zoneId = ZoneId.systemDefault() // Or use a specific time zone if needed
         return instant.atZone(zoneId).toLocalDate()
+    }
+
+    override fun parseRunDate(dateString: String): LocalDate {
+        return LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE)
     }
 }

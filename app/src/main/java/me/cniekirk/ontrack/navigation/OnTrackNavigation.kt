@@ -8,8 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
-import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import me.cniekirk.ontrack.core.compose.navigation.LocalResultEventBus
 import me.cniekirk.ontrack.core.compose.navigation.ResultEffect
@@ -24,6 +23,9 @@ import me.cniekirk.ontrack.di.metroViewModel
 import me.cniekirk.ontrack.feature.home.Home
 import me.cniekirk.ontrack.feature.home.HomeRoute
 import me.cniekirk.ontrack.feature.home.HomeViewModel
+import me.cniekirk.ontrack.feature.servicedetail.ServiceDetail
+import me.cniekirk.ontrack.feature.servicedetail.ServiceDetailRoute
+import me.cniekirk.ontrack.feature.servicedetail.ServiceDetailViewModel
 import me.cniekirk.ontrack.feature.servicelist.ServiceList
 import me.cniekirk.ontrack.feature.servicelist.ServiceListRoute
 import me.cniekirk.ontrack.feature.servicelist.ServiceListViewModel
@@ -41,10 +43,8 @@ fun OnTrackNavigation(modifier: Modifier = Modifier) {
         NavDisplay(
             modifier = modifier,
             entryDecorators = listOf(
-                // Add the default decorators for managing scenes and saving state
-                rememberSceneSetupNavEntryDecorator(),
-                rememberSavedStateNavEntryDecorator(),
                 // Then add the view model store decorator
+                rememberSaveableStateHolderNavEntryDecorator(),
                 rememberViewModelStoreNavEntryDecorator()
             ),
             backStack = backStack,
@@ -82,7 +82,13 @@ fun OnTrackNavigation(modifier: Modifier = Modifier) {
                 }
                 entry<ServiceList> { serviceList ->
                     val viewModel = metroViewModel<ServiceListViewModel> { serviceListFactory.create(serviceList.serviceListRequest) }
-                    ServiceListRoute(viewModel)
+                    ServiceListRoute(viewModel) { serviceDetailRequest ->
+                        backStack.add(ServiceDetail(serviceDetailRequest))
+                    }
+                }
+                entry<ServiceDetail> { serviceDetail ->
+                    val viewModel = metroViewModel<ServiceDetailViewModel> { serviceDetailFactory.create(serviceDetail.serviceDetailRequest) }
+                    ServiceDetailRoute(viewModel)
                 }
             }
         )

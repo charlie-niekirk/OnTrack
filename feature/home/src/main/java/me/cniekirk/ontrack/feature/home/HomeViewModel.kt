@@ -1,17 +1,20 @@
 package me.cniekirk.ontrack.feature.home
 
 import androidx.lifecycle.ViewModel
+import com.github.michaelbull.result.onFailure
+import com.github.michaelbull.result.onSuccess
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
 import me.cniekirk.ontrack.core.di.viewmodel.ViewModelKey
 import me.cniekirk.ontrack.core.di.viewmodel.ViewModelScope
 import me.cniekirk.ontrack.core.domain.model.Station
-import me.cniekirk.ontrack.core.navigation.RequestTime
-import me.cniekirk.ontrack.core.navigation.ServiceListRequest
-import me.cniekirk.ontrack.core.navigation.ServiceListType
+import me.cniekirk.ontrack.core.domain.model.arguments.RequestTime
+import me.cniekirk.ontrack.core.domain.model.arguments.ServiceListRequest
+import me.cniekirk.ontrack.core.domain.model.arguments.ServiceListType
 import me.cniekirk.ontrack.core.navigation.StationType
-import me.cniekirk.ontrack.core.navigation.TrainStation
+import me.cniekirk.ontrack.core.domain.model.arguments.TrainStation
+import me.cniekirk.ontrack.core.domain.repository.RecentSearchesRepository
 import me.cniekirk.ontrack.core.platform.TimeProvider
 import me.cniekirk.ontrack.feature.home.state.HomeEffect
 import me.cniekirk.ontrack.feature.home.state.HomeState
@@ -26,12 +29,29 @@ private const val TIME_PAD_CHARACTER = '0'
 @ViewModelKey(HomeViewModel::class)
 @ContributesIntoMap(ViewModelScope::class, binding = binding<ViewModel>())
 class HomeViewModel(
+    private val recentSearchesRepository: RecentSearchesRepository,
     private val timeProvider: TimeProvider
 ) : ViewModel(), ContainerHost<HomeState, HomeEffect> {
 
     override val container = container<HomeState, HomeEffect>(
         HomeState(currentDateMillis = timeProvider.currentDateMillis())
-    )
+    ) {
+        fetchRecentSearches()
+    }
+
+    private fun fetchRecentSearches() = intent {
+        recentSearchesRepository.getRecentSearches()
+            .onSuccess { recentSearches ->
+                // Update state
+                reduce {
+                    state.copy(recentSearches = recentSearches)
+                }
+            }
+            .onFailure {
+                // Post error effect
+                postSideEffect(HomeEffect.ShowFailedToFetchRecentSearchesError)
+            }
+    }
 
     fun updateQueryType(queryType: QueryType) = intent {
         reduce {
@@ -100,6 +120,7 @@ class HomeViewModel(
         when (val targetStation = state.targetStationSelection) {
             is StationSelection.None -> {
                 // Invalid, post error
+                postSideEffect(HomeEffect.ShowNoStationSelectedError)
             }
             is StationSelection.Selected -> {
                 val serviceListRequest = when (val filterStation = state.filterStationSelection) {
@@ -129,6 +150,7 @@ class HomeViewModel(
                         )
                     }
                 }
+
                 postSideEffect(HomeEffect.NavigateToServiceList(serviceListRequest))
             }
         }

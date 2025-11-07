@@ -1,8 +1,8 @@
-//import com.google.protobuf.gradle.id
-
 plugins {
     alias(libs.plugins.ontrack.android.application.compose)
     alias(libs.plugins.org.jetbrains.kotlin.plugin.serialization)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.baselineprofile)
 }
 
 android {
@@ -18,36 +18,17 @@ android {
     buildFeatures {
         buildConfig = true
     }
-}
 
-//protobuf {
-//    protoc {
-//        artifact = "com.google.protobuf:protoc:4.32.0"
-//    }
-//    // Generates the java Protobuf-lite code for the Protobufs in this project. See
-//    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
-//    // for more information.
-//    generateProtoTasks {
-//        // see https://github.com/google/protobuf-gradle-plugin/issues/518
-//        // see https://github.com/google/protobuf-gradle-plugin/issues/491
-//        // all() here because of android multi-variant
-//        all().forEach { task ->
-//            // this only works on version 3.8+ that has buildins for javalite / kotlin lite
-//            // with previous version the java build in is to be removed and a new plugin
-//            // need to be declared
-//            task.builtins {
-//                id("java") { // id is imported above
-//                    option("lite")
-//                }
-//            }
-//        }
-//    }
-//}
+    metro {
+        debug.set(true)
+    }
+}
 
 dependencies {
     implementation(project(":core:compose"))
     implementation(project(":core:data"))
     implementation(project(":core:database"))
+    implementation(project(":core:datastore"))
     implementation(project(":core:di"))
     implementation(project(":core:domain"))
     implementation(project(":core:navigation"))
@@ -55,6 +36,7 @@ dependencies {
     implementation(project(":core:platform"))
 
     implementation(project(":feature:home"))
+    implementation(project(":feature:servicedetail"))
     implementation(project(":feature:servicelist"))
     implementation(project(":feature:stationsearch"))
 
@@ -70,11 +52,13 @@ dependencies {
     implementation(libs.org.jetbrains.kotlinx.serialization.json)
 
     implementation(libs.com.jakewharton.timber)
+    implementation(libs.androidx.profileinstaller)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    "baselineProfile"(project(":baselineprofile"))
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

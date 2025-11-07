@@ -1,6 +1,7 @@
 package me.cniekirk.ontrack.feature.servicelist
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,26 +28,41 @@ import me.cniekirk.ontrack.core.domain.model.services.Platform
 import me.cniekirk.ontrack.core.domain.model.services.ServiceLocation
 import me.cniekirk.ontrack.core.domain.model.services.TimeStatus
 import me.cniekirk.ontrack.core.domain.model.services.TrainService
-import me.cniekirk.ontrack.core.navigation.ServiceListType
+import me.cniekirk.ontrack.core.domain.model.arguments.ServiceDetailRequest
+import me.cniekirk.ontrack.core.domain.model.arguments.ServiceListType
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
-fun ServiceListRoute(viewModel: ServiceListViewModel) {
+fun ServiceListRoute(
+    viewModel: ServiceListViewModel,
+    serviceClicked: (ServiceDetailRequest) -> Unit
+) {
     val state by viewModel.collectAsState()
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
-            else -> {}
+            is ServiceListEffect.DisplayError -> {
+
+            }
+            is ServiceListEffect.NavigateToServiceDetails -> {
+                serviceClicked(sideEffect.serviceDetailRequest)
+            }
         }
     }
 
-    ServiceListScreen(state = state)
+    ServiceListScreen(
+        state = state,
+        serviceClicked = viewModel::serviceSelected
+    )
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun ServiceListScreen(state: ServiceListState) {
+private fun ServiceListScreen(
+    state: ServiceListState,
+    serviceClicked: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -113,7 +129,8 @@ private fun ServiceListScreen(state: ServiceListState) {
                     items(state.trainServiceList) { trainService ->
                         TrainServiceListItem(
                             trainService = trainService,
-                            serviceListType = state.serviceListType
+                            serviceListType = state.serviceListType,
+                            onServiceClicked = { serviceClicked(it) }
                         )
                         HorizontalDivider()
                     }
@@ -127,12 +144,14 @@ private fun ServiceListScreen(state: ServiceListState) {
 private fun TrainServiceListItem(
     trainService: TrainService,
     serviceListType: ServiceListType,
+    onServiceClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { onServiceClicked(trainService.serviceId) },
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         val scheduledTime = when (val time = trainService.timeStatus) {

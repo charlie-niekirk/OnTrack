@@ -2,15 +2,18 @@ package me.cniekirk.ontrack.core.data.repository
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
-import me.cniekirk.ontrack.core.data.mapper.toTrainService
+import me.cniekirk.ontrack.core.data.mapper.ServiceMapper
+import me.cniekirk.ontrack.core.data.mapper.toServiceDetails
 import me.cniekirk.ontrack.core.data.util.safeApiCall
 import me.cniekirk.ontrack.core.domain.model.error.NetworkError
+import me.cniekirk.ontrack.core.domain.model.servicedetails.ServiceDetails
 import me.cniekirk.ontrack.core.domain.model.services.TrainService
 import me.cniekirk.ontrack.core.domain.repository.RealtimeTrainsRepository
 import me.cniekirk.ontrack.core.network.api.realtimetrains.RealtimeTrainsApi
 
 internal class RealtimeTrainsRepositoryImpl(
-    private val realtimeTrainsApi: RealtimeTrainsApi
+    private val realtimeTrainsApi: RealtimeTrainsApi,
+    private val serviceMapper: ServiceMapper
 ) : RealtimeTrainsRepository {
 
     override suspend fun getDepartureBoardOnDateTime(
@@ -28,7 +31,7 @@ internal class RealtimeTrainsRepositoryImpl(
                 day = day,
                 time = time
             )
-        }.map { response -> response.services.map { it.toTrainService() } }
+        }.map { response -> response.services.map { serviceMapper.toTrainService(it) } }
     }
 
     override suspend fun getDepartureBoardOnDateTimeTo(
@@ -48,7 +51,7 @@ internal class RealtimeTrainsRepositoryImpl(
                 day = day,
                 time = time
             )
-        }.map { response -> response.services.map { it.toTrainService() } }
+        }.map { response -> response.services.map { serviceMapper.toTrainService(it) } }
     }
 
     override suspend fun getArrivalBoardOnDateTime(
@@ -66,7 +69,7 @@ internal class RealtimeTrainsRepositoryImpl(
                 day = day,
                 time = time
             )
-        }.map { response -> response.services.map { it.toTrainService(isArrival = true) } }
+        }.map { response -> response.services.map { serviceMapper.toTrainService(it, isArrival = true) } }
     }
 
     override suspend fun getArrivalBoardOnDateTimeFrom(
@@ -86,13 +89,13 @@ internal class RealtimeTrainsRepositoryImpl(
                 day = day,
                 time = time
             )
-        }.map { response -> response.services.map { it.toTrainService(isArrival = true) } }
+        }.map { response -> response.services.map { serviceMapper.toTrainService(it, isArrival = true) } }
     }
 
     override suspend fun getCurrentDepartureBoard(station: String): Result<List<TrainService>, NetworkError> {
         return safeApiCall {
             realtimeTrainsApi.getCurrentDepartures(location = station)
-        }.map { response -> response.services.map { it.toTrainService() } }
+        }.map { response -> response.services.map { serviceMapper.toTrainService(it) } }
     }
 
     override suspend fun getCurrentDepartureBoardTo(
@@ -104,13 +107,13 @@ internal class RealtimeTrainsRepositoryImpl(
                 location = fromStation,
                 toLocation = toStation
             )
-        }.map { response -> response.services.map { it.toTrainService() } }
+        }.map { response -> response.services.map { serviceMapper.toTrainService(it) } }
     }
 
     override suspend fun getCurrentArrivalBoard(station: String): Result<List<TrainService>, NetworkError> {
         return safeApiCall {
             realtimeTrainsApi.getCurrentArrivals(location = station)
-        }.map { response -> response.services.map { it.toTrainService(isArrival = true) } }
+        }.map { response -> response.services.map { serviceMapper.toTrainService(it, isArrival = true) } }
     }
 
     override suspend fun getCurrentArrivalBoardFrom(
@@ -122,6 +125,22 @@ internal class RealtimeTrainsRepositoryImpl(
                 location = atStation,
                 fromLocation = fromStation
             )
-        }.map { response -> response.services.map { it.toTrainService(isArrival = true) } }
+        }.map { response -> response.services.map { serviceMapper.toTrainService(it, isArrival = true) } }
+    }
+
+    override suspend fun getServiceDetails(
+        serviceUid: String,
+        year: String,
+        month: String,
+        day: String
+    ): Result<ServiceDetails, NetworkError> {
+        return safeApiCall {
+            realtimeTrainsApi.getServiceDetails(
+                serviceUid = serviceUid,
+                year = year,
+                month = month,
+                day = day
+            )
+        }.map { response -> response.toServiceDetails() }
     }
 }

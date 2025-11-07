@@ -2,17 +2,24 @@ package me.cniekirk.ontrack.feature.home
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -36,10 +43,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import me.cniekirk.ontrack.core.compose.theme.OnTrackTheme
-import me.cniekirk.ontrack.core.navigation.RequestTime
-import me.cniekirk.ontrack.core.navigation.ServiceListRequest
+import me.cniekirk.ontrack.core.domain.model.arguments.RequestTime
+import me.cniekirk.ontrack.core.domain.model.arguments.ServiceListRequest
+import me.cniekirk.ontrack.core.domain.model.arguments.ServiceListType
+import me.cniekirk.ontrack.core.domain.model.arguments.TrainStation
 import me.cniekirk.ontrack.core.navigation.StationType
 import me.cniekirk.ontrack.feature.home.components.DepartingArrivingButtonGroup
 import me.cniekirk.ontrack.feature.home.components.StationCard
@@ -65,6 +76,12 @@ fun HomeRoute(
             is HomeEffect.NavigateToServiceList -> {
                 navigateToServiceList(sideEffect.serviceListRequest)
             }
+            HomeEffect.ShowNoStationSelectedError -> {
+
+            }
+            HomeEffect.ShowFailedToFetchRecentSearchesError -> {
+
+            }
         }
     }
 
@@ -77,7 +94,8 @@ fun HomeRoute(
         onClearFilterStationClicked = viewModel::clearFilterStation,
         onDateTimeSet = viewModel::processSelectedDateTime,
         onResetDateTimeClicked = viewModel::resetDateTime,
-        onSearchClicked = viewModel::searchTrains
+        onSearchClicked = viewModel::searchTrains,
+        onRecentSearchClicked = { navigateToServiceList(it) }
     )
 }
 
@@ -92,7 +110,8 @@ private fun HomeScreen(
     onClearFilterStationClicked: () -> Unit,
     onDateTimeSet: (Long, Int, Int) -> Unit,
     onResetDateTimeClicked: () -> Unit,
-    onSearchClicked: () -> Unit
+    onSearchClicked: () -> Unit,
+    onRecentSearchClicked: (ServiceListRequest) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -260,6 +279,125 @@ private fun HomeScreen(
                 )
             }
         }
+
+        RecentSearchesSection(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            recentSearches = state.recentSearches,
+            onRecentSearchClicked = { onRecentSearchClicked(it) }
+        )
+    }
+}
+
+@Composable
+private fun RecentSearchesSection(
+    modifier: Modifier = Modifier,
+    recentSearches: List<ServiceListRequest>,
+    onRecentSearchClicked: (ServiceListRequest) -> Unit
+) {
+    Column(modifier = modifier) {
+        if (recentSearches.isNotEmpty()) {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
+
+            Text(
+                modifier = Modifier.padding(bottom = 12.dp),
+                text = stringResource(R.string.recent_searches_title),
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(recentSearches) { search ->
+                    RecentSearchItem(
+                        search = search,
+                        onClick = { onRecentSearchClicked(search) }
+                    )
+                }
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.no_recent_searches),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecentSearchItem(
+    modifier: Modifier = Modifier,
+    search: ServiceListRequest,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = search.targetStation.name,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text(
+                    text = when (search.serviceListType) {
+                        ServiceListType.DEPARTURES -> stringResource(R.string.departures_title)
+                        ServiceListType.ARRIVALS -> stringResource(R.string.arrivals_title)
+                    },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            search.filterStation?.let { filterStation ->
+                Text(
+                    modifier = Modifier.padding(top = 4.dp),
+                    text = stringResource(R.string.recent_search_filter, filterStation.name),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = when (val time = search.requestTime) {
+                    is RequestTime.Now -> stringResource(R.string.now_departure_time)
+                    is RequestTime.AtTime -> stringResource(
+                        R.string.set_departure_time,
+                        time.day,
+                        time.month,
+                        time.year,
+                        time.hours,
+                        time.mins
+                    )
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -283,12 +421,43 @@ private fun getPlaceholderText(isFilter: Boolean, queryType: QueryType): Int {
     }
 }
 
+private class HomeStatePreviewParameterProvider : PreviewParameterProvider<HomeState> {
+    override val values: Sequence<HomeState> = sequenceOf(
+        // Empty recent searches
+        HomeState(currentDateMillis = 0L),
+        // Populated recent searches
+        HomeState(
+            currentDateMillis = 0L,
+            recentSearches = listOf(
+                ServiceListRequest(
+                    serviceListType = ServiceListType.DEPARTURES,
+                    requestTime = RequestTime.Now,
+                    targetStation = TrainStation(crs = "VIC", name = "London Victoria"),
+                    filterStation = TrainStation(crs = "BRI", name = "Brighton")
+                ),
+                ServiceListRequest(
+                    serviceListType = ServiceListType.ARRIVALS,
+                    requestTime = RequestTime.AtTime(
+                        year = "2024",
+                        month = "03",
+                        day = "15",
+                        hours = "14",
+                        mins = "30"
+                    ),
+                    targetStation = TrainStation(crs = "PAD", name = "London Paddington"),
+                    filterStation = null
+                )
+            )
+        )
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-private fun HomeScreenPreview() {
-    val state = HomeState(currentDateMillis = 0L)
-
+private fun HomeScreenPreview(
+    @PreviewParameter(HomeStatePreviewParameterProvider::class) state: HomeState
+) {
     OnTrackTheme {
         Surface {
             HomeScreen(
@@ -300,7 +469,101 @@ private fun HomeScreenPreview() {
                 onClearFilterStationClicked = {},
                 onDateTimeSet = { _, _, _ -> },
                 onResetDateTimeClicked = {},
-                onSearchClicked = {}
+                onSearchClicked = {},
+                onRecentSearchClicked = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun RecentSearchItemPreview() {
+    val sampleSearch = ServiceListRequest(
+        serviceListType = ServiceListType.DEPARTURES,
+        requestTime = RequestTime.Now,
+        targetStation = TrainStation(crs = "VIC", name = "London Victoria"),
+        filterStation = TrainStation(crs = "BRI", name = "Brighton")
+    )
+
+    OnTrackTheme {
+        Surface {
+            RecentSearchItem(
+                search = sampleSearch,
+                onClick = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun RecentSearchItemWithTimePreview() {
+    val sampleSearch = ServiceListRequest(
+        serviceListType = ServiceListType.ARRIVALS,
+        requestTime = RequestTime.AtTime(
+            year = "2024",
+            month = "03",
+            day = "15",
+            hours = "14",
+            mins = "30"
+        ),
+        targetStation = TrainStation(crs = "PAD", name = "London Paddington"),
+        filterStation = null
+    )
+
+    OnTrackTheme {
+        Surface {
+            RecentSearchItem(
+                search = sampleSearch,
+                onClick = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun RecentSearchesSectionWithDataPreview() {
+    val sampleSearches = listOf(
+        ServiceListRequest(
+            serviceListType = ServiceListType.DEPARTURES,
+            requestTime = RequestTime.Now,
+            targetStation = TrainStation(crs = "VIC", name = "London Victoria"),
+            filterStation = TrainStation(crs = "BRI", name = "Brighton")
+        ),
+        ServiceListRequest(
+            serviceListType = ServiceListType.ARRIVALS,
+            requestTime = RequestTime.AtTime(
+                year = "2024",
+                month = "03",
+                day = "15",
+                hours = "14",
+                mins = "30"
+            ),
+            targetStation = TrainStation(crs = "PAD", name = "London Paddington"),
+            filterStation = null
+        )
+    )
+
+    OnTrackTheme {
+        Surface {
+            RecentSearchesSection(
+                recentSearches = sampleSearches,
+                onRecentSearchClicked = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun RecentSearchesSectionEmptyPreview() {
+    OnTrackTheme {
+        Surface {
+            RecentSearchesSection(
+                recentSearches = emptyList(),
+                onRecentSearchClicked = {}
             )
         }
     }

@@ -11,6 +11,7 @@ import dev.zacsweers.metro.Multibinds
 import dev.zacsweers.metro.Provider
 import dev.zacsweers.metro.Provides
 import me.cniekirk.ontrack.core.di.viewmodel.ViewModelScope
+import me.cniekirk.ontrack.feature.servicedetail.ServiceDetailViewModel
 import me.cniekirk.ontrack.feature.servicelist.ServiceListViewModel
 import me.cniekirk.ontrack.feature.stationsearch.StationSearchViewModel
 import kotlin.reflect.KClass
@@ -32,6 +33,8 @@ interface ViewModelGraph {
     val stationSearchFactory: StationSearchViewModel.Factory
 
     val serviceListFactory: ServiceListViewModel.Factory
+
+    val serviceDetailFactory: ServiceDetailViewModel.Factory
 
     @GraphExtension.Factory
     fun interface Factory {

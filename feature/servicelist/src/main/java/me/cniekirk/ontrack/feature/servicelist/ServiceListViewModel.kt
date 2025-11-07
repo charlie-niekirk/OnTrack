@@ -11,18 +11,22 @@ import me.cniekirk.ontrack.core.di.viewmodel.ViewModelKey
 import me.cniekirk.ontrack.core.domain.model.error.NetworkError
 import me.cniekirk.ontrack.core.domain.model.services.TrainService
 import me.cniekirk.ontrack.core.domain.repository.RealtimeTrainsRepository
-import me.cniekirk.ontrack.core.navigation.RequestTime
-import me.cniekirk.ontrack.core.navigation.ServiceListRequest
-import me.cniekirk.ontrack.core.navigation.ServiceListType
+import me.cniekirk.ontrack.core.domain.model.arguments.RequestTime
+import me.cniekirk.ontrack.core.domain.model.arguments.ServiceDetailRequest
+import me.cniekirk.ontrack.core.domain.model.arguments.ServiceListRequest
+import me.cniekirk.ontrack.core.domain.model.arguments.ServiceListType
+import me.cniekirk.ontrack.core.domain.repository.RecentSearchesRepository
 import me.cniekirk.ontrack.feature.servicelist.model.ServiceListError
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
+import timber.log.Timber
 
 @AssistedInject
 @ViewModelKey(ServiceListViewModel::class)
 class ServiceListViewModel(
     @Assisted private val serviceListRequest: ServiceListRequest,
-    private val realtimeTrainsRepository: RealtimeTrainsRepository
+    private val realtimeTrainsRepository: RealtimeTrainsRepository,
+    private val recentSearchesRepository: RecentSearchesRepository
 ) : ViewModel(), ContainerHost<ServiceListState, ServiceListEffect> {
 
     override val container = container<ServiceListState, ServiceListEffect>(
@@ -33,6 +37,7 @@ class ServiceListViewModel(
         )
     ) {
         getTrainList()
+        cacheRecentSearch()
     }
 
     fun getTrainList() = intent {
@@ -58,6 +63,30 @@ class ServiceListViewModel(
                     }
                 }
             }
+    }
+
+    private fun cacheRecentSearch() = intent {
+        recentSearchesRepository.cacheRecentSearch(serviceListRequest)
+            .onSuccess {
+                Timber.v("Cached recent search successfully: $serviceListRequest")
+            }
+            .onFailure {
+                Timber.e("Recent search cache failed: $serviceListRequest, error: $it")
+            }
+    }
+
+    fun serviceSelected(serviceUid: String) = intent {
+        val service = state.trainServiceList.first { it.serviceId == serviceUid }
+        postSideEffect(
+            ServiceListEffect.NavigateToServiceDetails(
+                serviceDetailRequest = ServiceDetailRequest(
+                    serviceUid = serviceUid,
+                    year = service.runDate.year,
+                    month = service.runDate.month,
+                    day = service.runDate.day
+                )
+            )
+        )
     }
 
     private suspend fun fetchTrainServices(): Result<List<TrainService>, NetworkError> {

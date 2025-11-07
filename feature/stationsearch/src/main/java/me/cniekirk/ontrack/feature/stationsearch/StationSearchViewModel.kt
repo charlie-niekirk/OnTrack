@@ -19,7 +19,6 @@ import timber.log.Timber
 
 @AssistedInject
 @ViewModelKey(StationSearchViewModel::class)
-//@ContributesIntoMap(ViewModelScope::class, binding = binding<ViewModel>())
 class StationSearchViewModel(
     @Assisted private val stationType: StationType,
     private val stationsRepository: StationsRepository

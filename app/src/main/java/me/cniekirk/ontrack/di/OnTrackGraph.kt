@@ -11,6 +11,7 @@ import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.binding
 import me.cniekirk.ontrack.core.data.di.DataProviders
 import me.cniekirk.ontrack.core.database.di.DatabaseProviders
+import me.cniekirk.ontrack.core.datastore.di.DatastoreProviders
 import me.cniekirk.ontrack.core.di.components.ApplicationContext
 import me.cniekirk.ontrack.di.ViewModelGraph
 import me.cniekirk.ontrack.core.network.di.NetworkProviders
@@ -22,7 +23,8 @@ import kotlin.reflect.KClass
     bindingContainers = [
         NetworkProviders::class,
         DatabaseProviders::class,
-        PlatformProviders::class
+        DatastoreProviders::class,
+        PlatformProviders::class,
     ]
 )
 interface OnTrackGraph : ViewModelGraph.Factory, DataProviders {

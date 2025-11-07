@@ -5,11 +5,11 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
-import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.AssistedInject
 import me.cniekirk.ontrack.core.domain.repository.StationsRepository
 import timber.log.Timber
 
-@Inject
+@AssistedInject
 class UpdateStationsWorker(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,

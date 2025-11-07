@@ -18,4 +18,8 @@
     <string name="button_search">Search</string>
 
     <string name="cd_clear_station">Clear station</string>
+
+    <string name="recent_searches_title">Recent Searches</string>
+    <string name="no_recent_searches">No recent searches</string>
+    <string name="recent_search_filter">via %1$s</string>
 </resources>

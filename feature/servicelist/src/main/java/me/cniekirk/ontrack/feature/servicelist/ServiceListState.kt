@@ -1,7 +1,7 @@
 package me.cniekirk.ontrack.feature.servicelist
 
 import me.cniekirk.ontrack.core.domain.model.services.TrainService
-import me.cniekirk.ontrack.core.navigation.ServiceListType
+import me.cniekirk.ontrack.core.domain.model.arguments.ServiceListType
 
 data class ServiceListState(
     val isLoading: Boolean = true,
