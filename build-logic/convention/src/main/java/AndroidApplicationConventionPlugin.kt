@@ -19,6 +19,19 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 configureKotlinAndroid(this)
                 configureSigning(this)
                 defaultConfig.targetSdk = 36
+
+                // Create benchmark build type for baseline profile testing
+                buildTypes {
+                    create("benchmark") {
+                        // Benchmark builds should be similar to release but with debug signing
+                        initWith(getByName("release"))
+                        signingConfig = signingConfigs.getByName("debug")
+                        matchingFallbacks += listOf("release")
+                        isDebuggable = false
+                        isMinifyEnabled = true
+                        isShrinkResources = true
+                    }
+                }
             }
         }
     }

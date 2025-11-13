@@ -11,10 +11,6 @@ android {
             isIncludeAndroidResources = true
         }
     }
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {
@@ -22,11 +18,14 @@ dependencies {
     implementation(project(":core:domain"))
 
     implementation(libs.androidx.core.ktx)
+
     implementation(libs.androidx.datastore)
     implementation(libs.com.google.protobuf.javalite)
 
     testImplementation(libs.org.jetbrains.kotlinx.coroutines.test)
 }
+
+// Proto configuration - commented out but preserved for future restoration
 
 protobuf {
     protoc {

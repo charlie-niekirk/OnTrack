@@ -27,7 +27,6 @@ android {
     }
 
     targetProjectPath = ":app"
-
 }
 
 // This is the configuration block for the Baseline Profile plugin.
@@ -48,7 +47,7 @@ androidComponents {
         val artifactsLoader = v.artifacts.getBuiltArtifactsLoader()
         v.instrumentationRunnerArguments.put(
             "targetAppId",
-            v.testedApks.map { artifactsLoader.load(it)?.applicationId }
+            v.testedApks.map { artifactsLoader.load(it)?.applicationId.orEmpty() }
         )
     }
 }

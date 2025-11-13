@@ -155,4 +155,8 @@ class HomeViewModel(
             }
         }
     }
+
+    fun clearAllRecentSearches() = intent {
+
+    }
 }

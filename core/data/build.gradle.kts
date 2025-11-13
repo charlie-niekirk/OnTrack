@@ -29,11 +29,3 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.io.mockk)
 }
-
-//// Ensure protobuf generation in datastore completes before KSP
-//tasks.configureEach {
-//    if (name.startsWith("ksp") && name.endsWith("Kotlin")) {
-//        dependsOn(":core:datastore:generateDebugProto")
-//        dependsOn(":core:datastore:generateReleaseProto")
-//    }
-//}

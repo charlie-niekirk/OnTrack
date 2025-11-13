@@ -4,6 +4,8 @@ import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,21 +50,101 @@ class BaselineProfileGenerator {
             // See: https://d.android.com/topic/performance/baselineprofiles/dex-layout-optimizations
             includeInStartupProfile = true
         ) {
-            // This block defines the app's critical user journey. Here we are interested in
-            // optimizing for app startup. But you can also navigate and scroll through your most important UI.
-
             // Start default activity for your app
-            pressHome()
             startActivityAndWait()
 
-            // TODO Write more interactions to optimize advanced journeys of your app.
-            // For example:
-            // 1. Wait until the content is asynchronously loaded
-            // 2. Scroll the feed content
-            // 3. Navigate to detail screen
+            device.waitAndFindObject(By.text("Search for Trains"), 10_000)
 
-            // Check UiAutomator documentation for more information how to interact with the app.
-            // https://d.android.com/training/testing/other-components/ui-automator
+            // 2. Scroll through recent searches if they exist
+            // The fake data includes 3 recent searches
+//            device.wait(
+//                Until.hasObject(By.text("Recent Searches")),
+//                2_000
+//            )?.let {
+//                // Scroll the recent searches list
+//                val recentSearchesList = device.findObject(By.scrollable(true))
+//                recentSearchesList?.let {
+//                    it.setGestureMargin(device.displayWidth / 5)
+//                    it.scroll(androidx.test.uiautomator.Direction.DOWN, 1.0f)
+//                }
+//            }
+//
+//            // 3. Click on station selection to trigger station search
+//            // This will load fake stations from FakeStationsRepository
+            device.findObject(By.text("Trains departing from"))?.click()
+            device.waitForIdle()
+//
+//            // Wait for station list to appear
+//            device.wait(
+//                Until.hasObject(By.text("London Paddington")),
+//                3_000
+//            )
+//
+//            // 4. Scroll through the station list
+//            val stationList = device.findObject(By.scrollable(true))
+//            stationList?.let {
+//                it.setGestureMargin(device.displayWidth / 5)
+//                // Scroll down through fake stations
+//                it.scroll(androidx.test.uiautomator.Direction.DOWN, 0.5f)
+//                device.waitForIdle()
+//                // Scroll back up
+//                it.scroll(androidx.test.uiautomator.Direction.UP, 0.3f)
+//            }
+//
+//            // 5. Select a station (Reading)
+//            device.findObject(By.text("Reading"))?.click()
+//            device.waitForIdle()
+//
+//            // 6. Back on home screen, click search to view services
+//            // This will load fake train services from FakeRealtimeTrainsRepository
+//            device.findObject(By.text("Search"))?.click()
+//            device.waitForIdle()
+//
+//            // 7. Wait for service list to load
+//            device.wait(
+//                Until.hasObject(By.textContains("SERVICE_")),
+//                3_000
+//            )
+//
+//            // 8. Scroll through the service list
+//            val serviceList = device.findObject(By.scrollable(true))
+//            serviceList?.let {
+//                it.setGestureMargin(device.displayWidth / 5)
+//                // Scroll down through services
+//                it.scroll(androidx.test.uiautomator.Direction.DOWN, 0.8f)
+//                device.waitForIdle()
+//                // Scroll back up
+//                it.scroll(androidx.test.uiautomator.Direction.UP, 0.5f)
+//                device.waitForIdle()
+//            }
+//
+//            // 9. Click on a service to view details
+//            device.findObject(By.textContains("SERVICE_"))?.click()
+//            device.waitForIdle()
+//
+//            // Wait for service details to load
+//            device.wait(
+//                Until.hasObject(By.text("Great Western Railway")),
+//                3_000
+//            )
+//
+//            // 10. Navigate back to home
+//            device.pressBack()
+//            device.waitForIdle()
+//            device.pressBack()
+//            device.waitForIdle()
+//
+//            // 11. Test another journey: Click on a recent search
+//            device.findObject(By.text("London Paddington"))?.click()
+//            device.waitForIdle()
+//
+//            // Wait for service list
+//            device.wait(
+//                Until.hasObject(By.textContains("SERVICE_")),
+//                3_000
+//            )
+
+            // Done - this exercises the main user journeys with fake data
         }
     }
 }

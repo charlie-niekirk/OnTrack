@@ -24,6 +24,25 @@ android {
     }
 }
 
+// Configure baseline profile to use the benchmark variant
+baselineProfile {
+    baselineProfileRulesRewrite = true
+
+    filter {
+        include("me.cniekirk.ontrack.**")
+    }
+}
+
+// Enable baseline profile generation for the benchmark variant
+androidComponents {
+    onVariants { variant ->
+        if (variant.name == "benchmark") {
+            // This ensures the generateBenchmarkBaselineProfile task is created
+            variant.enableAndroidTestCoverage = false
+        }
+    }
+}
+
 dependencies {
     implementation(project(":core:compose"))
     implementation(project(":core:data"))
@@ -50,6 +69,8 @@ dependencies {
 
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.org.jetbrains.kotlinx.serialization.json)
+
+    benchmarkImplementation(libs.com.michael.bull.kotlin.result)
 
     implementation(libs.com.jakewharton.timber)
     implementation(libs.androidx.profileinstaller)

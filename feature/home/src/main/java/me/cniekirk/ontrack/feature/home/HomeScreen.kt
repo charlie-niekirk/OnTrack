@@ -95,7 +95,8 @@ fun HomeRoute(
         onDateTimeSet = viewModel::processSelectedDateTime,
         onResetDateTimeClicked = viewModel::resetDateTime,
         onSearchClicked = viewModel::searchTrains,
-        onRecentSearchClicked = { navigateToServiceList(it) }
+        onRecentSearchClicked = { navigateToServiceList(it) },
+        onClearAllRecentSearchesClicked = viewModel::clearAllRecentSearches
     )
 }
 
@@ -111,7 +112,8 @@ private fun HomeScreen(
     onDateTimeSet: (Long, Int, Int) -> Unit,
     onResetDateTimeClicked: () -> Unit,
     onSearchClicked: () -> Unit,
-    onRecentSearchClicked: (ServiceListRequest) -> Unit
+    onRecentSearchClicked: (ServiceListRequest) -> Unit,
+    onClearAllRecentSearchesClicked: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -285,7 +287,8 @@ private fun HomeScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             recentSearches = state.recentSearches,
-            onRecentSearchClicked = { onRecentSearchClicked(it) }
+            onRecentSearchClicked = { onRecentSearchClicked(it) },
+            onClearAllRecentSearchesClicked = { onClearAllRecentSearchesClicked() }
         )
     }
 }
@@ -294,7 +297,8 @@ private fun HomeScreen(
 private fun RecentSearchesSection(
     modifier: Modifier = Modifier,
     recentSearches: List<ServiceListRequest>,
-    onRecentSearchClicked: (ServiceListRequest) -> Unit
+    onRecentSearchClicked: (ServiceListRequest) -> Unit,
+    onClearAllRecentSearchesClicked: () -> Unit
 ) {
     Column(modifier = modifier) {
         if (recentSearches.isNotEmpty()) {
@@ -302,11 +306,25 @@ private fun RecentSearchesSection(
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
-            Text(
-                modifier = Modifier.padding(bottom = 12.dp),
-                text = stringResource(R.string.recent_searches_title),
-                style = MaterialTheme.typography.titleMedium
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.recent_searches_title),
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                TextButton(
+                    onClick = { onClearAllRecentSearchesClicked() }
+                ) {
+                    Text(
+                        text = stringResource(R.string.clear_recent_searches),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
 
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -470,7 +488,8 @@ private fun HomeScreenPreview(
                 onDateTimeSet = { _, _, _ -> },
                 onResetDateTimeClicked = {},
                 onSearchClicked = {},
-                onRecentSearchClicked = {}
+                onRecentSearchClicked = {},
+                onClearAllRecentSearchesClicked = {}
             )
         }
     }
@@ -550,7 +569,8 @@ private fun RecentSearchesSectionWithDataPreview() {
         Surface {
             RecentSearchesSection(
                 recentSearches = sampleSearches,
-                onRecentSearchClicked = {}
+                onRecentSearchClicked = {},
+                onClearAllRecentSearchesClicked = {}
             )
         }
     }
@@ -563,7 +583,8 @@ private fun RecentSearchesSectionEmptyPreview() {
         Surface {
             RecentSearchesSection(
                 recentSearches = emptyList(),
-                onRecentSearchClicked = {}
+                onRecentSearchClicked = {},
+                onClearAllRecentSearchesClicked = {}
             )
         }
     }
