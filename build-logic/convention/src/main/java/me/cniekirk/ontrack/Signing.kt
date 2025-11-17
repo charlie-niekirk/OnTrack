@@ -13,6 +13,8 @@ internal fun Project.configureSigning(applicationExtension: ApplicationExtension
         // Falls back to Gradle properties for local development.
         val keyStorePath = System.getenv("SIGNING_KEY_STORE_PATH")
             ?: project.findProperty("SIGNING_KEY_STORE_PATH")?.toString()
+        logger.info("keyStorePath = $keyStorePath")
+
         if (keyStorePath != null) {
             storeFile = file(keyStorePath)
             storePassword = System.getenv("SIGNING_STORE_PASSWORD")

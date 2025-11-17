@@ -11,4 +11,6 @@ sealed interface HomeEffect {
     data object ShowNoStationSelectedError : HomeEffect
 
     data object ShowFailedToFetchRecentSearchesError : HomeEffect
+
+    data object ShowFailedToClearRecentSearchesError : HomeEffect
 }

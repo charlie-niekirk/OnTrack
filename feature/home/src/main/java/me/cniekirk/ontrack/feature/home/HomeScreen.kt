@@ -82,6 +82,9 @@ fun HomeRoute(
             HomeEffect.ShowFailedToFetchRecentSearchesError -> {
 
             }
+            HomeEffect.ShowFailedToClearRecentSearchesError -> {
+
+            }
         }
     }
 

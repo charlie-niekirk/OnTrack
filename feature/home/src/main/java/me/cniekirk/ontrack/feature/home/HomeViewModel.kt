@@ -157,6 +157,9 @@ class HomeViewModel(
     }
 
     fun clearAllRecentSearches() = intent {
-
+        recentSearchesRepository.deleteAllRecentSearches()
+            .onFailure {
+                postSideEffect(HomeEffect.ShowFailedToClearRecentSearchesError)
+            }
     }
 }
