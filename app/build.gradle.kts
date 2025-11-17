@@ -34,14 +34,14 @@ baselineProfile {
 }
 
 // Enable baseline profile generation for the benchmark variant
-androidComponents {
-    onVariants { variant ->
-        if (variant.name == "benchmark") {
-            // This ensures the generateBenchmarkBaselineProfile task is created
-            variant.enableAndroidTestCoverage = false
-        }
-    }
-}
+//androidComponents {
+//    onVariants { variant ->
+//        if (variant.name == "benchmark") {
+//            // This ensures the generateBenchmarkBaselineProfile task is created
+//            variant.enableAndroidTestCoverage = false
+//        }
+//    }
+//}
 
 dependencies {
     implementation(project(":core:compose"))
