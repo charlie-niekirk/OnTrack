@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Route format -->
+    <string name="route_format">%1$s to %2$s</string>
+
+    <!-- Time labels -->
+    <string name="arrives">Arrives: </string>
+    <string name="departs">Departs: </string>
+    <string name="platform">Platform</string>
+
+    <!-- Time status formats -->
+    <string name="departed_time">%1$s</string>
+    <string name="arrived_time">%1$s</string>
+    <string name="time_with_delay">%1$s (+%2$d min)</string>
+    <string name="delayed_time">%1$s (+%2$d min delay)</string>
+    <string name="cancelled">Cancelled</string>
+
+    <!-- Service location statuses -->
+    <string name="service_location_approaching_station">Approaching station</string>
+    <string name="service_location_approaching_platform">Approaching platform</string>
+    <string name="service_location_at_platform">At platform</string>
+    <string name="service_location_preparing_departure">Preparing to depart</string>
+    <string name="service_location_ready_to_depart">Ready to depart</string>
+</resources>
