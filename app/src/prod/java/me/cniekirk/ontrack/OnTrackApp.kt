@@ -14,7 +14,7 @@ import me.cniekirk.ontrack.di.OnTrackGraph
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-open class OnTrackApp : Application() {
+class OnTrackApp : Application() {
 
     open val appGraph by lazy {
         createGraphFactory<OnTrackGraph.Factory>().create(this)

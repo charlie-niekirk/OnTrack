@@ -20,16 +20,19 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 configureSigning(this)
                 defaultConfig.targetSdk = 36
 
-                // Create benchmark build type for baseline profile testing
-                buildTypes {
-                    create("benchmark") {
-                        // Benchmark builds should be similar to release but with debug signing
-                        initWith(getByName("release"))
-                        signingConfig = signingConfigs.getByName("debug")
-                        matchingFallbacks += listOf("release")
-                        isDebuggable = false
-                        isMinifyEnabled = true
-                        isShrinkResources = true
+                // Create acceptance flavor for baseline profile testing
+                // Baseline profile gradle tasks are only created for flavors, not build types
+                flavorDimensions += "version"
+                productFlavors {
+                    create("acceptance") {
+                        dimension = "version"
+                        // The acceptance flavor uses the acceptance source set which contains
+                        // TestOnTrackApp with fake implementations for baseline profile testing
+                    }
+                    create("prod") {
+                        dimension = "version"
+                        // Production flavor uses the main source set
+                        isDefault = true
                     }
                 }
             }

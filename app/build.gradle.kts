@@ -24,7 +24,7 @@ android {
     }
 }
 
-// Configure baseline profile to use the benchmark variant
+// Configure baseline profile to use the acceptance variant
 baselineProfile {
     baselineProfileRulesRewrite = true
 
@@ -33,10 +33,10 @@ baselineProfile {
     }
 }
 
-// Enable baseline profile generation for the benchmark variant
+// Enable baseline profile generation for the acceptance variant
 //androidComponents {
 //    onVariants { variant ->
-//        if (variant.name == "benchmark") {
+//        if (variant.name == "acceptance") {
 //            // This ensures the generateBenchmarkBaselineProfile task is created
 //            variant.enableAndroidTestCoverage = false
 //        }
@@ -70,7 +70,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.org.jetbrains.kotlinx.serialization.json)
 
-    benchmarkImplementation(libs.com.michael.bull.kotlin.result)
+    implementation(libs.com.michael.bull.kotlin.result)
 
     implementation(libs.com.jakewharton.timber)
     implementation(libs.androidx.profileinstaller)

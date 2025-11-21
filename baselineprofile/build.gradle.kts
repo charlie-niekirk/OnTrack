@@ -24,6 +24,9 @@ android {
         targetSdk = 36
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Specify which flavor to use when resolving the app dependency
+        missingDimensionStrategy("version", "acceptance")
     }
 
     targetProjectPath = ":app"
