@@ -3,9 +3,11 @@ package me.cniekirk.ontrack.feature.home
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import me.cniekirk.ontrack.core.domain.model.Station
 import me.cniekirk.ontrack.core.domain.model.arguments.RequestTime
@@ -37,7 +39,7 @@ class HomeViewModelTest {
         val testRequests = listOf(createStationListRequest())
 
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(testRequests)
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(testRequests)
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
 
         viewModel.test(this) {
@@ -48,23 +50,10 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `onCreate should fetch recent searches and post ShowFailedToFetchRecentSearchesError on error`() = runTest {
-        every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Err(LocalDataError.Unknown)
-        viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
-
-        viewModel.test(this) {
-            runOnCreate()
-
-            expectSideEffect(HomeEffect.ShowFailedToFetchRecentSearchesError)
-        }
-    }
-
-    @Test
     fun `updateQueryType should update query type`() = runTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
 
         // When
@@ -81,7 +70,7 @@ class HomeViewModelTest {
     fun `stationSelected should update filter station`() = runTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
         val station = createTestStation(STATION_NAME_MANCHESTER, STATION_CRS_MANCHESTER)
 
@@ -101,7 +90,7 @@ class HomeViewModelTest {
     fun `clearTargetStation should reset target station to None`() = runTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
         val station = createTestStation(STATION_NAME_LEEDS, STATION_CRS_LEEDS)
 
@@ -124,7 +113,7 @@ class HomeViewModelTest {
     fun `clearFilterStation should reset filter station to None`() = runTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
         val station = createTestStation(STATION_NAME_MANCHESTER, STATION_CRS_MANCHESTER)
 
@@ -148,7 +137,7 @@ class HomeViewModelTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
         every { timeProvider.convertMillisToDate(TEST_DATE_MILLIS) } returns TEST_LOCAL_DATE
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
 
         // When
@@ -172,7 +161,7 @@ class HomeViewModelTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
         every { timeProvider.convertMillisToDate(TEST_DATE_MILLIS) } returns TEST_LOCAL_DATE
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
 
         // When
@@ -193,7 +182,7 @@ class HomeViewModelTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
         every { timeProvider.convertMillisToDate(TEST_DATE_MILLIS) } returns TEST_LOCAL_DATE
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
 
         // When
@@ -215,7 +204,7 @@ class HomeViewModelTest {
     fun `searchTrains with no target station should post ShowNoStationSelectedError side effect`() = runTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
 
         // When
@@ -230,7 +219,7 @@ class HomeViewModelTest {
     fun `searchTrains with target station and no filter should post NavigateToServiceList effect for DEPARTURES`() = runTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
         val targetStation = createTestStation(STATION_NAME_LEEDS, STATION_CRS_LEEDS)
 
@@ -259,7 +248,7 @@ class HomeViewModelTest {
     fun `searchTrains with target station and no filter should post NavigateToServiceList effect for ARRIVALS`() = runTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
         val targetStation = createTestStation(STATION_NAME_LEEDS, STATION_CRS_LEEDS)
 
@@ -288,7 +277,7 @@ class HomeViewModelTest {
     fun `searchTrains with target and filter station should include filter in request`() = runTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
         val targetStation = createTestStation(STATION_NAME_LEEDS, STATION_CRS_LEEDS)
         val filterStation = createTestStation(STATION_NAME_MANCHESTER, STATION_CRS_MANCHESTER)
@@ -321,7 +310,7 @@ class HomeViewModelTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
         every { timeProvider.convertMillisToDate(TEST_DATE_MILLIS) } returns TEST_LOCAL_DATE
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
         val targetStation = createTestStation(STATION_NAME_LEEDS, STATION_CRS_LEEDS)
 
@@ -354,7 +343,7 @@ class HomeViewModelTest {
     fun `multiple station selections should only keep the most recent selection`() = runTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
         val firstStation = createTestStation(STATION_NAME_LEEDS, STATION_CRS_LEEDS)
         val secondStation = createTestStation(STATION_NAME_MANCHESTER, STATION_CRS_MANCHESTER)
@@ -381,7 +370,7 @@ class HomeViewModelTest {
     fun `clearing station after selection should allow reselection`() = runTest {
         // Given
         every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
-        coEvery { recentSearchesRepository.getRecentSearches() } returns Ok(emptyList())
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
         viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
         val station = createTestStation(STATION_NAME_LEEDS, STATION_CRS_LEEDS)
 
@@ -402,6 +391,40 @@ class HomeViewModelTest {
             val state = awaitState()
             assertTrue(state.targetStationSelection is StationSelection.Selected)
             assertEquals(station, (state.targetStationSelection as StationSelection.Selected).station)
+        }
+    }
+
+    @Test
+    fun `clearAllRecentSearches should clear all recent searches successfully`() = runTest {
+        // Given
+        every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
+        coEvery { recentSearchesRepository.deleteAllRecentSearches() } returns Ok(Unit)
+        viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
+
+        // When
+        viewModel.test(this) {
+            containerHost.clearAllRecentSearches()
+        }
+
+        // Then
+        coVerify { recentSearchesRepository.deleteAllRecentSearches() }
+    }
+
+    @Test
+    fun `clearAllRecentSearches should post ShowFailedToClearRecentSearchesError on failure`() = runTest {
+        // Given
+        every { timeProvider.currentDateMillis() } returns TEST_CURRENT_DATE_MILLIS
+        coEvery { recentSearchesRepository.getRecentSearches() } returns flowOf(emptyList())
+        coEvery { recentSearchesRepository.deleteAllRecentSearches() } returns Err(LocalDataError.Unknown)
+        viewModel = HomeViewModel(recentSearchesRepository, timeProvider)
+
+        // When
+        viewModel.test(this) {
+            containerHost.clearAllRecentSearches()
+
+            // Then
+            expectSideEffect(HomeEffect.ShowFailedToClearRecentSearchesError)
         }
     }
 

@@ -23,6 +23,10 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                         isIncludeAndroidResources = true
                     }
                 }
+
+                defaultConfig {
+                    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+                }
             }
 
             dependencies {

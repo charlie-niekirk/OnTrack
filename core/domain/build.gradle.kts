@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.org.jetbrains.kotlinx.coroutines.core)
     implementation(libs.org.jetbrains.kotlinx.serialization.json)
     implementation(libs.com.michael.bull.kotlin.result)
 }

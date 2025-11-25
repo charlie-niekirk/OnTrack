@@ -6,6 +6,7 @@ import com.github.michaelbull.result.onSuccess
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
+import kotlinx.coroutines.flow.catch
 import me.cniekirk.ontrack.core.di.viewmodel.ViewModelKey
 import me.cniekirk.ontrack.core.di.viewmodel.ViewModelScope
 import me.cniekirk.ontrack.core.domain.model.Station
@@ -40,17 +41,17 @@ class HomeViewModel(
     }
 
     private fun fetchRecentSearches() = intent {
-        recentSearchesRepository.getRecentSearches()
-            .onSuccess { recentSearches ->
-                // Update state
-                reduce {
-                    state.copy(recentSearches = recentSearches)
+        repeatOnSubscription {
+            recentSearchesRepository.getRecentSearches()
+                .catch {
+                    postSideEffect(HomeEffect.ShowFailedToFetchRecentSearchesError)
                 }
-            }
-            .onFailure {
-                // Post error effect
-                postSideEffect(HomeEffect.ShowFailedToFetchRecentSearchesError)
-            }
+                .collect { recentSearches ->
+                    reduce {
+                        state.copy(recentSearches = recentSearches)
+                    }
+                }
+        }
     }
 
     fun updateQueryType(queryType: QueryType) = intent {

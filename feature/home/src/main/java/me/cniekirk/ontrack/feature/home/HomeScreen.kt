@@ -41,6 +41,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -105,7 +106,7 @@ fun HomeRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HomeScreen(
+internal fun HomeScreen(
     state: HomeState,
     onQueryTypeChanged: (QueryType) -> Unit,
     onTargetStationClicked: () -> Unit,
@@ -347,6 +348,7 @@ private fun RecentSearchesSection(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
+                    modifier = Modifier.testTag("no_recent_searches"),
                     text = stringResource(R.string.no_recent_searches),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

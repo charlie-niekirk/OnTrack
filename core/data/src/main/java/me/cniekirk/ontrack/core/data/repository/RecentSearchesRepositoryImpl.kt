@@ -3,7 +3,8 @@ package me.cniekirk.ontrack.core.data.repository
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import me.cniekirk.ontrack.core.data.mapper.toDatastoreListRequest
 import me.cniekirk.ontrack.core.data.mapper.toDomainModel
 import me.cniekirk.ontrack.core.data.mapper.toLocalDataError
@@ -23,13 +24,11 @@ internal class RecentSearchesRepositoryImpl(
         }.mapError(Throwable::toLocalDataError)
     }
 
-    override suspend fun getRecentSearches(): Result<List<ServiceListRequest>, LocalDataError> {
-        return runCatching {
-            recentSearchesDataSource.recentSearches
-                .first()
-                .recentSearchesList
-                .map { it.toDomainModel() }
-        }.mapError(Throwable::toLocalDataError)
+    override suspend fun getRecentSearches(): Flow<List<ServiceListRequest>> {
+        return recentSearchesDataSource.recentSearches
+            .map { recentSearches ->
+                recentSearches.recentSearchesList.map { it.toDomainModel() }
+            }
     }
 
     override suspend fun deleteRecentSearch(serviceListRequest: ServiceListRequest): Result<Unit, LocalDataError> {

@@ -13,58 +13,6 @@ import me.cniekirk.ontrack.core.domain.repository.RealtimeTrainsRepository
 
 class FakeRealtimeTrainsRepository : RealtimeTrainsRepository {
 
-    private fun createFakeServices(count: Int = 10): List<TrainService> {
-        return List(count) { index ->
-            TrainService(
-                serviceId = "SERVICE_$index",
-                runDate = RunDate(
-                    day = "10",
-                    month = "11",
-                    year = "2025"
-                ),
-                origin = if (index % 2 == 0) "London Paddington" else "Reading",
-                destination = if (index % 2 == 0) "Oxford" else "London Paddington",
-                timeStatus = when (index % 5) {
-                    0 -> TimeStatus.OnTime(scheduledTime = "${9 + index}:${(index * 5) % 60}")
-                    1 -> TimeStatus.Delayed(
-                        scheduledTime = "${9 + index}:00",
-                        estimatedTime = "${9 + index}:${5 + index}",
-                        delayInMinutes = 5 + index
-                    )
-                    2 -> TimeStatus.Departed(
-                        actualDepartureTime = "${9 + index}:02",
-                        scheduledDepartureTime = "${9 + index}:00",
-                        delayInMinutes = 2
-                    )
-                    3 -> TimeStatus.Arrived(
-                        actualArrivalTime = "${9 + index}:03",
-                        scheduledArrivalTime = "${9 + index}:00",
-                        delayInMinutes = 3
-                    )
-                    else -> TimeStatus.Unknown
-                },
-                platform = if (index % 3 == 0) {
-                    Platform.Confirmed(
-                        platformName = "${(index % 10) + 1}",
-                        isChanged = false
-                    )
-                } else {
-                    Platform.Estimated(
-                        platformName = "${(index % 10) + 1}",
-                        isChanged = false
-                    )
-                },
-                serviceLocation = when (index % 5) {
-                    0 -> ServiceLocation.AT_PLATFORM
-                    1 -> ServiceLocation.APPROACHING_PLATFORM
-                    2 -> ServiceLocation.READY_TO_DEPART
-                    else -> null
-                },
-                trainOperatingCompany = if (index % 2 == 0) "Great Western Railway" else "CrossCountry"
-            )
-        }
-    }
-
     override suspend fun getDepartureBoardOnDateTime(
         station: String,
         year: String,
@@ -148,5 +96,57 @@ class FakeRealtimeTrainsRepository : RealtimeTrainsRepository {
                 locations = emptyList() // Simplified for baseline profile
             )
         )
+    }
+
+    private fun createFakeServices(count: Int = 10): List<TrainService> {
+        return List(count) { index ->
+            TrainService(
+                serviceId = "SERVICE_$index",
+                runDate = RunDate(
+                    day = "10",
+                    month = "11",
+                    year = "2025"
+                ),
+                origin = if (index % 2 == 0) "London Paddington" else "Reading",
+                destination = if (index % 2 == 0) "Oxford" else "London Paddington",
+                timeStatus = when (index % 5) {
+                    0 -> TimeStatus.OnTime(scheduledTime = "${9 + index}:${(index * 5) % 60}")
+                    1 -> TimeStatus.Delayed(
+                        scheduledTime = "${9 + index}:00",
+                        estimatedTime = "${9 + index}:${5 + index}",
+                        delayInMinutes = 5 + index
+                    )
+                    2 -> TimeStatus.Departed(
+                        actualDepartureTime = "${9 + index}:02",
+                        scheduledDepartureTime = "${9 + index}:00",
+                        delayInMinutes = 2
+                    )
+                    3 -> TimeStatus.Arrived(
+                        actualArrivalTime = "${9 + index}:03",
+                        scheduledArrivalTime = "${9 + index}:00",
+                        delayInMinutes = 3
+                    )
+                    else -> TimeStatus.Unknown
+                },
+                platform = if (index % 3 == 0) {
+                    Platform.Confirmed(
+                        platformName = "${(index % 10) + 1}",
+                        isChanged = false
+                    )
+                } else {
+                    Platform.Estimated(
+                        platformName = "${(index % 10) + 1}",
+                        isChanged = false
+                    )
+                },
+                serviceLocation = when (index % 5) {
+                    0 -> ServiceLocation.AT_PLATFORM
+                    1 -> ServiceLocation.APPROACHING_PLATFORM
+                    2 -> ServiceLocation.READY_TO_DEPART
+                    else -> null
+                },
+                trainOperatingCompany = if (index % 2 == 0) "Great Western Railway" else "CrossCountry"
+            )
+        }
     }
 }
